@@ -11,7 +11,7 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 使用ProtoBuf的序列化器
+ * 使用ProtoBuf的序列化器，需要实现序列化和反序列化两个方法
  * @author ziyang
  */
 public class ProtobufSerializer implements CommonSerializer {

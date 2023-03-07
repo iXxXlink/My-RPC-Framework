@@ -28,6 +28,7 @@ public class ServiceProviderImpl implements ServiceProvider {
         logger.info("向接口: {} 注册服务: {}", service.getClass().getInterfaces(), serviceName);
     }
 
+    //根据服务名获得对应的服务实例
     @Override
     public Object getServiceProvider(String serviceName) {
         Object service = serviceMap.get(serviceName);

@@ -60,6 +60,7 @@ public abstract class AbstractRpcServer implements RpcServer {
                         publishService(obj, oneInterface.getCanonicalName());
                     }
                 } else {
+                    //注册服务
                     publishService(obj, serviceName);
                 }
             }
@@ -68,6 +69,7 @@ public abstract class AbstractRpcServer implements RpcServer {
 
     @Override
     public <T> void publishService(T service, String serviceName) {
+        //服务提供是属于服务端
         serviceProvider.addServiceProvider(service, serviceName);
         serviceRegistry.register(serviceName, new InetSocketAddress(host, port));
     }

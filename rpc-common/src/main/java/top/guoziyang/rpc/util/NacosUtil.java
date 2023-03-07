@@ -35,6 +35,7 @@ public class NacosUtil {
 
     public static NamingService getNacosNamingService() {
         try {
+            //连接Nacos服务器
             return NamingFactory.createNamingService(SERVER_ADDR);
         } catch (NacosException e) {
             logger.error("连接到Nacos时有错误发生: ", e);
@@ -53,6 +54,8 @@ public class NacosUtil {
         return namingService.getAllInstances(serviceName);
     }
 
+
+    //清除本服务器在Nacos注册的所有服务
     public static void clearRegistry() {
         if(!serviceNames.isEmpty() && address != null) {
             String host = address.getHostName();

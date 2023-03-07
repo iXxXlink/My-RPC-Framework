@@ -4,8 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.guoziyang.rpc.entity.RpcRequest;
 import top.guoziyang.rpc.entity.RpcResponse;
-import top.guoziyang.rpc.transport.netty.client.NettyClient;
-import top.guoziyang.rpc.transport.socket.client.SocketClient;
 import top.guoziyang.rpc.util.RpcMessageChecker;
 
 import java.lang.reflect.InvocationHandler;
@@ -13,7 +11,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 /**
  * RPC客户端动态代理
@@ -39,21 +36,20 @@ public class RpcClientProxy implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) {
         logger.info("调用方法: {}#{}", method.getDeclaringClass().getName(), method.getName());
+        //将方法名、参数包装为 rpcRequest
         RpcRequest rpcRequest = new RpcRequest(UUID.randomUUID().toString(), method.getDeclaringClass().getName(),
                 method.getName(), args, method.getParameterTypes(), false);
         RpcResponse rpcResponse = null;
-        if (client instanceof NettyClient) {
-            try {
-                CompletableFuture<RpcResponse> completableFuture = (CompletableFuture<RpcResponse>) client.sendRequest(rpcRequest);
-                rpcResponse = completableFuture.get();
-            } catch (Exception e) {
-                logger.error("方法调用请求发送失败", e);
-                return null;
-            }
+        //远程访问
+        try {
+            CompletableFuture<RpcResponse> completableFuture = (CompletableFuture<RpcResponse>) client.sendRequest(rpcRequest);
+            //一直阻塞，直到收到服务端消息，调用后compete后执行get
+            rpcResponse = completableFuture.get();
+        } catch (Exception e) {
+            logger.error("方法调用请求发送失败", e);
+            return null;
         }
-        if (client instanceof SocketClient) {
-            rpcResponse = (RpcResponse) client.sendRequest(rpcRequest);
-        }
+
         RpcMessageChecker.check(rpcRequest, rpcResponse);
         return rpcResponse.getData();
     }

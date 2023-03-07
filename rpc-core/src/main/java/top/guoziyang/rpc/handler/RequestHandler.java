@@ -30,6 +30,7 @@ public class RequestHandler {
         return invokeTargetMethod(rpcRequest, service);
     }
 
+    //通过反射的范式调用服务
     private Object invokeTargetMethod(RpcRequest rpcRequest, Object service) {
         Object result;
         try {

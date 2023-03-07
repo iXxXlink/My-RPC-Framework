@@ -40,15 +40,21 @@ public class NettyServer extends AbstractRpcServer {
         scanServices();
     }
 
+    //开启netty服务器
     @Override
     public void start() {
+        //执行钩子函数
         ShutdownHook.getShutdownHook().addClearAllHook();
+        //处理连接的线程池
         EventLoopGroup bossGroup = new NioEventLoopGroup();
+        //处理IO操作的线程池
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
 
+            //开启netty，等待客户端请求
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(bossGroup, workerGroup)
+                    //NIO socket(TCP)
                     .channel(NioServerSocketChannel.class)
                     .handler(new LoggingHandler(LogLevel.INFO))
                     .option(ChannelOption.SO_BACKLOG, 256)
@@ -58,18 +64,25 @@ public class NettyServer extends AbstractRpcServer {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
                             ChannelPipeline pipeline = ch.pipeline();
+                            //心跳
                             pipeline.addLast(new IdleStateHandler(30, 0, 0, TimeUnit.SECONDS))
+                                    //经过加密object变为字节数组ByteBuf
                                     .addLast(new CommonEncoder(serializer))
+                                    //解密，返回Object数据
                                     .addLast(new CommonDecoder())
                                     .addLast(new NettyServerHandler());
                         }
                     });
+            //服务器绑定ip + port，并异步启动netty服务器（非main线程执行netty服务器，而是bossGroup、workerGroup中线程负责）
             ChannelFuture future = serverBootstrap.bind(host, port).sync();
+            //使main线程阻塞，防止执行finally中语句（如果没有这一步，子线程开启netty服务器，main线程执行finally中语句关闭资源，导致netty也被关闭）
+            //目的是为了优雅关闭netty服务器，否则可以不需要该语句，同时吧finally中语句删了也能实现。
             future.channel().closeFuture().sync();
 
         } catch (InterruptedException e) {
             logger.error("启动服务器时有错误发生: ", e);
         } finally {
+            //关闭netty服务器
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
         }

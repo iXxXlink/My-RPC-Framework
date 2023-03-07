@@ -35,6 +35,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<RpcResponse>
     protected void channelRead0(ChannelHandlerContext ctx, RpcResponse msg) throws Exception {
         try {
             logger.info(String.format("客户端接收到消息: %s", msg));
+            //从服务端收到数据后，调用unprocessedRequests.complete
             unprocessedRequests.complete(msg);
         } finally {
             ReferenceCountUtil.release(msg);

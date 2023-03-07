@@ -34,6 +34,7 @@ public class NettyClient implements RpcClient {
     private static final EventLoopGroup group;
     private static final Bootstrap bootstrap;
 
+    //初始化netty客户端
     static {
         group = new NioEventLoopGroup();
         bootstrap = new Bootstrap();
@@ -67,15 +68,19 @@ public class NettyClient implements RpcClient {
             logger.error("未设置序列化器");
             throw new RpcException(RpcError.SERIALIZER_NOT_FOUND);
         }
+        //CompletableFuture用于获得异步处理结果
         CompletableFuture<RpcResponse> resultFuture = new CompletableFuture<>();
         try {
+            //使用nacos获得对应服务的服务器地址
             InetSocketAddress inetSocketAddress = serviceDiscovery.lookupService(rpcRequest.getInterfaceName());
+            //获得对应服务器的channel
             Channel channel = ChannelProvider.get(inetSocketAddress, serializer);
             if (!channel.isActive()) {
                 group.shutdownGracefully();
                 return null;
             }
             unprocessedRequests.put(rpcRequest.getRequestId(), resultFuture);
+            //使用该channel异步发送 rpcRequest
             channel.writeAndFlush(rpcRequest).addListener((ChannelFutureListener) future1 -> {
                 if (future1.isSuccess()) {
                     logger.info(String.format("客户端发送消息: %s", rpcRequest.toString()));

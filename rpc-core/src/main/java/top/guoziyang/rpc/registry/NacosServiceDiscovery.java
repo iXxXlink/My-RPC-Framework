@@ -30,11 +30,13 @@ public class NacosServiceDiscovery implements ServiceDiscovery {
     @Override
     public InetSocketAddress lookupService(String serviceName) {
         try {
+            //从主仓中心Nacos中获得服务对应的服务器地址
             List<Instance> instances = NacosUtil.getAllInstance(serviceName);
             if(instances.size() == 0) {
                 logger.error("找不到对应的服务: " + serviceName);
                 throw new RpcException(RpcError.SERVICE_NOT_FOUND);
             }
+            //通过某种策略，从instances列表中选一个服务器instance
             Instance instance = loadBalancer.select(instances);
             return new InetSocketAddress(instance.getIp(), instance.getPort());
         } catch (NacosException e) {

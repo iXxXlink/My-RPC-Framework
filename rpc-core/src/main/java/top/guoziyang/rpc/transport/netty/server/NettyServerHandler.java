@@ -26,6 +26,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<RpcRequest> 
         this.requestHandler = SingletonFactory.getInstance(RequestHandler.class);
     }
 
+    //channelRead0 方法的实现需要自己设置msg的泛型
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RpcRequest msg) throws Exception {
         try {
@@ -34,8 +35,10 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<RpcRequest> 
                 return;
             }
             logger.info("服务器接收到请求: {}", msg);
+            //处理服务请求，获得返回值
             Object result = requestHandler.handle(msg);
             if (ctx.channel().isActive() && ctx.channel().isWritable()) {
+                //向ctx中写入服务端对请求的处理结果
                 ctx.writeAndFlush(RpcResponse.success(result, msg.getRequestId()));
             } else {
                 logger.error("通道不可写");

@@ -20,6 +20,7 @@ public class NettyTestClient {
         RpcClientProxy rpcClientProxy = new RpcClientProxy(client);
         HelloService helloService = rpcClientProxy.getProxy(HelloService.class);
         HelloObject object = new HelloObject(12, "This is a message");
+        //对于当前单个客户端来说，阻塞直到收到服务端的数据
         String res = helloService.hello(object);
         System.out.println(res);
         ByeService byeService = rpcClientProxy.getProxy(ByeService.class);
