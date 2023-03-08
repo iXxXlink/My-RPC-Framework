@@ -36,6 +36,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<RpcRequest> 
             }
             logger.info("服务器接收到请求: {}", msg);
             //处理服务请求，获得返回值
+            //可能存在高并发
             Object result = requestHandler.handle(msg);
             if (ctx.channel().isActive() && ctx.channel().isWritable()) {
                 //向ctx中写入服务端对请求的处理结果

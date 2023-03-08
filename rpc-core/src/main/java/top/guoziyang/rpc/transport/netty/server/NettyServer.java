@@ -45,8 +45,8 @@ public class NettyServer extends AbstractRpcServer {
     public void start() {
         //执行钩子函数
         ShutdownHook.getShutdownHook().addClearAllHook();
-        //处理连接的线程池
-        EventLoopGroup bossGroup = new NioEventLoopGroup();
+        //处理连接的线程池，一般线程数为1就行。如果并发量高，可以不设置线程数，默认为2*CPU数
+        EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         //处理IO操作的线程池
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
@@ -54,22 +54,27 @@ public class NettyServer extends AbstractRpcServer {
             //开启netty，等待客户端请求
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(bossGroup, workerGroup)
-                    //NIO socket(TCP)
+                    //设置为NIO模型 socket(TCP)
                     .channel(NioServerSocketChannel.class)
+                    //这里的handler不负责具体业务，是负责响应事件
                     .handler(new LoggingHandler(LogLevel.INFO))
                     .option(ChannelOption.SO_BACKLOG, 256)
                     .option(ChannelOption.SO_KEEPALIVE, true)
                     .childOption(ChannelOption.TCP_NODELAY, true)
+                    //childHandler指的是workerEventLoop中线程执行时使用的handle
                     .childHandler(new ChannelInitializer<SocketChannel>() {
+                        //每建立一个连接都执行一次initChannel。因为每个连接对应一个channel
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
+                            //每一个channel都有自己的pipeline（即handler链）
                             ChannelPipeline pipeline = ch.pipeline();
-                            //心跳
+                                    //心跳
                             pipeline.addLast(new IdleStateHandler(30, 0, 0, TimeUnit.SECONDS))
                                     //经过加密object变为字节数组ByteBuf
                                     .addLast(new CommonEncoder(serializer))
                                     //解密，返回Object数据
                                     .addLast(new CommonDecoder())
+                                    //每个客户端连接都是一个新的NettyServerHandler
                                     .addLast(new NettyServerHandler());
                         }
                     });
