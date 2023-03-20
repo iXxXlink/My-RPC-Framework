@@ -1,4 +1,4 @@
-package top.guoziyang.rpc.util;
+package top.guoziyang.rpc.config;
 
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.naming.NamingFactory;

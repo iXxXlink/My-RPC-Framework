@@ -8,7 +8,7 @@ import top.guoziyang.rpc.enumeration.RpcError;
 import top.guoziyang.rpc.exception.RpcException;
 import top.guoziyang.rpc.provider.ServiceProvider;
 import top.guoziyang.rpc.registry.ServiceRegistry;
-import top.guoziyang.rpc.util.ReflectUtil;
+import top.guoziyang.rpc.config.ReflectUtil;
 
 import java.net.InetSocketAddress;
 import java.util.Set;

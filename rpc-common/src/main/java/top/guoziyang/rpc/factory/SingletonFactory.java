@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class SingletonFactory {
 
-    private static Map<Class, Object> objectMap = new ConcurrentHashMap<>(16);
+    volatile private static Map<Class, Object> objectMap = new ConcurrentHashMap<>(16);
 
     private SingletonFactory() {}
 

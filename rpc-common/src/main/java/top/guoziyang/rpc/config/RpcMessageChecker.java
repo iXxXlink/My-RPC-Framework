@@ -1,4 +1,4 @@
-package top.guoziyang.rpc.util;
+package top.guoziyang.rpc.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

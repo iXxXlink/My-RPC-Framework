@@ -8,7 +8,7 @@ import top.guoziyang.rpc.enumeration.RpcError;
 import top.guoziyang.rpc.exception.RpcException;
 import top.guoziyang.rpc.loadbalancer.LoadBalancer;
 import top.guoziyang.rpc.loadbalancer.RandomLoadBalancer;
-import top.guoziyang.rpc.util.NacosUtil;
+import top.guoziyang.rpc.config.NacosUtil;
 
 import java.net.InetSocketAddress;
 import java.util.List;

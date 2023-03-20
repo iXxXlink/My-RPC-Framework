@@ -3,7 +3,7 @@ package top.guoziyang.rpc.hook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.guoziyang.rpc.factory.ThreadPoolFactory;
-import top.guoziyang.rpc.util.NacosUtil;
+import top.guoziyang.rpc.config.NacosUtil;
 
 /**
  * @author ziyang

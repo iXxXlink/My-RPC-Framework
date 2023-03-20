@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.guoziyang.rpc.enumeration.RpcError;
 import top.guoziyang.rpc.exception.RpcException;
-import top.guoziyang.rpc.util.NacosUtil;
+import top.guoziyang.rpc.config.NacosUtil;
 
 import java.net.InetSocketAddress;
 
